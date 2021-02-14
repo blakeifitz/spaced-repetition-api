@@ -1,3 +1,5 @@
+const AuthService = require('../auth/auth-service');
+
 const bcrypt = require('bcryptjs');
 
 const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/;
@@ -35,10 +37,16 @@ const UserService = {
     return bcrypt.hash(password, 12);
   },
   serializeUser(user) {
+    const sub = user.username;
+    const payload = {
+      user_id: user.id,
+      name: user.name,
+    };
     return {
       id: user.id,
       name: user.name,
       username: user.username,
+      authToken: AuthService.createJwt(sub, payload),
     };
   },
   populateUserWords(db, user_id) {
